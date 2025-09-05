@@ -82,7 +82,6 @@ sudo tc filter add dev eth0 protocol ip parent 1:0 prio 1 handle 0x1A2B3C4D fw f
 - Port to eBPF for more flexible packet processing.
 
 ## Flow
-# Kernel-Level VoIP Traffic Prioritizer Flowchart
 [Start: Packet Arrives at Network Interface]
 |
 v
@@ -129,4 +128,5 @@ v
 ## License
 
 GPL v2 
+
 

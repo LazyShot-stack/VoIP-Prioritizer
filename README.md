@@ -82,49 +82,51 @@ sudo tc filter add dev eth0 protocol ip parent 1:0 prio 1 handle 0x1A2B3C4D fw f
 - Port to eBPF for more flexible packet processing.
 
 ## Flow
+# Kernel-Level VoIP Traffic Prioritizer Flowchart
 [Start: Packet Arrives at Network Interface]
-       |
-       v
+|
+v
 [Netfilter Hook (NF_INET_POST_ROUTING)]
-       |  (voip_prio_nf.c)
-       v
+|  (voip_prio_nf.c)
+v
 [Packet Inspection]
-       | - Check IP protocol (UDP/TCP)
-       | - Extract source/destination ports
-       | - Compare with configured SIP/RTP ports
-       v
+| - Check IP protocol (UDP/TCP)
+| - Extract source/destination ports
+| - Compare with configured SIP/RTP ports
+v
 [Is VoIP Packet?] ----> No ----> [Pass Packet Unmodified (NF_ACCEPT)]
-       | Yes
-       v
+| Yes
+v
 [Mark Packet with Priority (skb->mark = 0x1A2B3C4D)]
-       |  (voip_prio_nf.c)
-       v
+|  (voip_prio_nf.c)
+v
 [Route to Traffic Control (tc) Subsystem]
-       | - Custom qdisc or prio qdisc processes marked packets
-       |  (voip_prio_qdisc.c, currently uses tc)
-       v
+| - Custom qdisc or prio qdisc processes marked packets
+|  (voip_prio_qdisc.c, currently uses tc)
+v
 [Prioritize VoIP Packet]
-       | - High-priority queue for marked packets
-       | - Low-priority for others
-       v
+| - High-priority queue for marked packets
+| - Low-priority for others
+v
 [Transmit Packet via Network Interface]
-       |
-       v
+|
+v
 [Congestion Monitoring (Future)]
-       | - Check queue lengths or drop rates
-       | - Adjust prioritization if needed
-       v
+| - Check queue lengths or drop rates
+| - Adjust prioritization if needed
+v
 [User-Space Configuration]
-       | - Sysfs interface (/sys/kernel/voip_prio)
-       | - User tool (voip_prio_ctl) updates SIP/RTP ports, thresholds
-       |  (voip_prio_sysfs.c, voip_prio_ctl.c)
-       v
+| - Sysfs interface (/sys/kernel/voip_prio)
+| - User tool (voip_prio_ctl) updates SIP/RTP ports, thresholds
+|  (voip_prio_sysfs.c, voip_prio_ctl.c)
+v
 [Update Kernel Config]
-       | - Spinlock-protected updates to voip_prio_config
-       |  (voip_prio.h, voip_prio.c)
-       v
+| - Spinlock-protected updates to voip_prio_config
+|  (voip_prio.h, voip_prio.c)
+v
 [End: Loop for Next Packet]
 
 ## License
 
 GPL v2 
+
